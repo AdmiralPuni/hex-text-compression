@@ -92,6 +92,7 @@
         <li>Doesn't support punctiation currently</li>
         <li>Can be somewhat viewed as partial 'cryptography' by differentiating dictionary, but probably easy to decode.</li>
         <li>This was created because of json problems, mine has a lot of text and I want to shorten them.</li>
+        <li>(Issue) Case sensitivity.</li>
     </ul>
     <table style="width:50%; margin: 0 auto;">
         <tr>
