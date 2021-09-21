@@ -6,10 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
+        html{
+            background-image: url('res/images/bg.jpg');
+        }
         body{
-            margin: 0 auto;
+            margin: 20px auto;
             width: 66%;
             font-family: 'Calibri';
+            padding: 10px;
+            border: 1px solid black;
+            background-color: white;
         }
         table{
             width: 100%;
@@ -20,6 +26,9 @@
             border: 1px solid black;
             padding: 10px;
             vertical-align: top;
+        }
+        .paragraph{
+            text-align: Justify;
         }
     </style>
 </head>
@@ -64,7 +73,7 @@
             }
         }
         //print_r($hex_list);
-        $sql = "select word, hex from wordlist_unique where length(word)> 7 order by hex limit 5";
+        $sql = "select word, hex from wordlist_unique where length(word)> 7 order by hex limit 3";
         $sample = $conn->query($sql);
         
         $conn->close();
@@ -74,7 +83,12 @@
     <ul>
         <li>A copy of the compressed dictionary is needed in the client computer creates a dependency, otherwise jumbles of unreadable hex number will be displayed.</li>
         <li>If the size of the word is less than 3 and the hex index is higher than 3 it would increase the size instead, which is why this is best used for long words.</li>
-        <li>(Theory) The dictionary should be sorted asc/desc? to attain maximum compression efficiency</li>
+        <li>(Theory) The dictionary should be sorted ascending to attain maximum compression efficiency</li>
+        <ul>
+            <li>There are around 500.000 word in the english language, God knows how many short word there is.</li>
+            <li>if 3 letter word has a three letter hex index the compression is worthless, break even.</li>
+            <li>if 3 letter word has a four letter hex index the compression is useless.</li>
+        </ul>
         <li>Doesn't support punctiation currently</li>
         <li>Can be somewhat viewed as partial 'cryptography' by differentiating dictionary, but probably easy to decode.</li>
         <li>This was created because of json problems, mine has a lot of text and I want to shorten them.</li>
@@ -93,24 +107,101 @@
             }
         ?>
     </table>
-    
-    <hr>
-    <h1>The demo text is smaller by <?= round((strlen($hex_string)/strlen($text))*100, 2)  ?>%</h1>
+    <br>
+    <table style="width:75%; margin: 0 auto;">
+        <tr>
+            <th colspan=4>Efficiency Table</th>
+        </tr>
+        <tr>
+            <th>Original</th>
+            <th>Compressed</th>
+            <th>Letter saved</th>
+            <th>Efficiency</th>
+        </tr>
+        <tr>
+            <td>Quantum</td>
+            <td>F1</td>
+            <td><?= strlen('Quantum')-strlen('F1') ?></td>
+            <td>Great</td>
+        </tr>
+        <tr>
+            <td>Physical</td>
+            <td>8A6AC</td>
+            <td><?= strlen('Physical')-strlen('8A6AC') ?></td>
+            <td>Good</td>
+        </tr>
+        <tr>
+            <td>the</td>
+            <td>1B2</td>
+            <td><?= strlen('the')-strlen('1B2') ?></td>
+            <td>Worthless</td>
+        </tr>
+        <tr>
+            <td>car</td>
+            <td>39AB</td>
+            <td><?= strlen('car')-strlen('39AB') ?></td>
+            <td>Terrible</td>
+        </tr>
+    </table>
+    <br>
+    <table>
+        <tr>
+            <th colspan=10>Sample Compression</th>
+        </tr>
+        <tr>
+            <?php
+                $limiter = 0;
+                foreach($text_array as $word){
+                    if($limiter == 10){
+                        break;
+                    }
+                    echo "<td style='width:10%;text-align:center;'>$word</td>";
+                    $limiter++;
+                }
+            ?>
+        </tr>
+        <tr>
+            <?php
+                $limiter = 0;
+                foreach($hex_list as $word){
+                    if($limiter == 10){
+                        break;
+                    }
+                    echo "<td style='width:10%;text-align:center;'>$word</td>";
+                    $limiter++;
+                }
+            ?>
+        </tr>
+    </table>
+    <h2>The demo text is smaller by <?= 100-round((strlen($hex_string)/strlen($text))*100, 2)  ?>%</h2>
     <table>
         <tr>
             <td>Comparison</td>
             <td>Original Text</td>
             <td>Compressed Text</td>
         </tr>
-        <tr >
-            <td>Word count</td>
-            <td style="width:45%"><?= strlen($text) ?></td>
-            <td style="width:45%"><?= strlen($hex_string) ?></td>
+        <tr>
+            <td>Letter Count</td>
+            <td><?= mb_strlen($text) ?></td>
+            <td><?= mb_strlen($hex_string) ?></td>
         </tr>
         <tr>
-            <td>Text</td>
-            <td><?= $text ?></td>
-            <td><?= $hex_string ?></td>
+            <td>Size</td>
+            <td style="width:35%;"><?= strlen($text) ?> Bytes</td>
+            <td style="width:35%;"><?= strlen($hex_string) ?> Bytes</td>
+        </tr>
+        
+        <tr>
+            <td>Percentage</td>
+            <td><?= round((strlen($text)/strlen($text))*100, 2)  ?>%</td>
+            <td><?= round((strlen($hex_string)/strlen($text))*100, 2)  ?>%</td>
+        </tr>
+        <tr>
+            <th colspan=3>Text</th>
+        </tr>
+        <tr class="paragraph">
+            <td style="width: 50%;" colspan=2><?= $text ?></td>
+            <td style="width: 50%;"><?= $hex_string ?></td>
         </tr>
     </table>
 </body>
